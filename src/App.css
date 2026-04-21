@@ -59,27 +59,43 @@ header h1 {
 
 /* ── Main ───────────────────────────────────────────────────── */
 main { 
-  padding: 0 1.5rem 2.5rem;
-  overflow-y: auto;
+  padding: 0;
+  overflow-y: hidden;
   flex: 1;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 .tab-content {
   display: none;
   background: var(--grad-card);
   border: 1px solid var(--border-light);
   border-radius: 0 var(--radius) var(--radius) var(--radius);
-  padding: clamp(1.25rem, 3vw, 2rem);
+  padding: clamp(0.75rem, 2vw, 1.25rem);
+  height: 100%;
+  overflow: hidden;
 }
-.tab-content.active { display: block; }
+.tab-content.active { display: flex; flex-direction: column; }
 
 /* ── Game ───────────────────────────────────────────────────── */
-.game-wrap { max-width: 600px; margin: 0 auto; text-align: center; }
+.game-wrap { 
+  max-width: 600px; 
+  margin: 0 auto; 
+  text-align: center; 
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  flex: 1;
+}
 
 .stats-bar {
   display: flex; justify-content: center;
-  gap: clamp(0.75rem, 3vw, 2rem);
-  margin-bottom: 1.75rem; flex-wrap: wrap;
+  gap: clamp(0.5rem, 2vw, 1.5rem);
+  margin-bottom: 1rem; flex-wrap: wrap;
+  flex-shrink: 0;
 }
 .stat-chip {
   background: var(--surface); border: 1px solid var(--border);
@@ -96,10 +112,11 @@ main {
   background: var(--grad-game);
   border: 1px solid rgba(99,102,241,0.4);
   border-radius: var(--radius);
-  padding: clamp(1.75rem, 5vw, 2.75rem) 2rem;
-  margin-bottom: 1.5rem;
+  padding: clamp(1rem, 4vw, 2rem) 1.5rem;
+  margin-bottom: 1rem;
   position: relative; overflow: hidden;
   box-shadow: 0 0 20px rgba(139,92,246,0.25), var(--shadow);
+  flex-shrink: 0;
 }
 .english-word-card::before {
   content: '';
@@ -129,15 +146,16 @@ main {
   font-size: 0.65rem; letter-spacing: 0.18em;
   color: var(--text3); text-transform: uppercase; margin-bottom: 0.9rem;
 }
-.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem; }
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-bottom: 1rem; flex-shrink: 0; }
 .choice-btn {
   background: var(--surface); border: 1.5px solid var(--border);
   border-radius: var(--radius);
-  padding: clamp(0.9rem, 3vw, 1.3rem) 1rem;
+  padding: clamp(0.6rem, 2vw, 1rem) 0.8rem;
   font-family: 'Noto Sans KR', sans-serif;
-  font-size: clamp(1.1rem, 4vw, 1.5rem);
+  font-size: clamp(0.9rem, 3vw, 1.3rem);
   color: var(--text); cursor: pointer;
-  transition: all 0.15s; min-height: 64px;
+  transition: all 0.15s; min-height: 50px;
+  flex-shrink: 0;
 }
 .choice-btn:hover:not(:disabled) {
   border-color: var(--indigo);
@@ -155,20 +173,22 @@ main {
 .choice-btn:disabled { cursor: default; }
 
 .result-msg {
-  font-size: 0.95rem; font-weight: 600;
-  margin-bottom: 1rem; min-height: 1.4rem;
+  font-size: 0.85rem; font-weight: 600;
+  margin-bottom: 0.75rem; min-height: 1.2rem;
+  flex-shrink: 0;
 }
 .result-msg.correct { color: var(--correct); }
 .result-msg.wrong   { color: var(--wrong); }
 
 .btn-next {
-  width: 100%; padding: 0.85rem;
+  width: 100%; padding: 0.7rem;
   border: 1.5px solid var(--indigo);
   border-radius: var(--radius);
   background: rgba(99,102,241,0.1);
   color: #a5b4fc;
-  font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 600;
+  font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 600;
   cursor: pointer; transition: all 0.15s; letter-spacing: 0.03em;
+  flex-shrink: 0;
 }
 .btn-next:hover { background: rgba(99,102,241,0.2); box-shadow: 0 0 20px rgba(139,92,246,0.25); }
 
