@@ -1,7 +1,6 @@
 /* ── Header ─────────────────────────────────────────────────── */
 header {
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 40;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -12,6 +11,7 @@ header {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  flex-shrink: 0;
 }
 .header-brand { display: flex; align-items: center; gap: 0.75rem; }
 .header-icon {
@@ -33,7 +33,7 @@ header h1 {
 .header-sub { font-size: 0.72rem; color: var(--text3); letter-spacing: 0.05em; white-space: nowrap; }
 
 /* ── Tabs ───────────────────────────────────────────────────── */
-.top-tabs { display: flex; gap: 0.4rem; padding: 1.25rem 1.5rem 0; }
+.top-tabs { display: flex; gap: 0.4rem; padding: 1.25rem 1.5rem 0; flex-shrink: 0; }
 .tab-btn {
   padding: 0.55rem 1.4rem;
   border-radius: 8px 8px 0 0;
@@ -61,7 +61,8 @@ header h1 {
 main { 
   padding: 0 1.5rem 2.5rem;
   overflow-y: auto;
-  max-height: calc(100vh - 90px);
+  flex: 1;
+  min-height: 0;
 }
 .tab-content {
   display: none;
