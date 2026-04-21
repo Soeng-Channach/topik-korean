@@ -1,0 +1,48 @@
+:root {
+  --bg:           #05091f;
+  --surface:      #0b1230;
+  --card:         #101c42;
+  --card-hover:   #162050;
+  --border:       #1c2d5e;
+  --border-light: #2a3f80;
+
+  --blue:   #3b82f6;
+  --indigo: #6366f1;
+  --violet: #8b5cf6;
+  --pink:   #ec4899;
+  --cyan:   #06b6d4;
+  --gold:   #f59e0b;
+
+  --grad-brand: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+  --grad-cyan:  linear-gradient(135deg, #06b6d4, #3b82f6);
+  --grad-gold:  linear-gradient(135deg, #f59e0b, #ef4444);
+  --grad-card:  linear-gradient(135deg, #101c42, #0d1635);
+  --grad-game:  linear-gradient(135deg, #0f1f55, #1a0f4f);
+
+  --correct: #10b981;
+  --wrong:   #f43f5e;
+
+  --text:  #e2e8f0;
+  --text2: #94a3b8;
+  --text3: #4a5e80;
+
+  --radius: 14px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse at 20% 20%, rgba(59,130,246,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(139,92,246,0.07) 0%, transparent 60%);
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 99px; }
