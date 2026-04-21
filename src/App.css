@@ -58,7 +58,11 @@ header h1 {
 .tab-btn:hover:not(.active) { color: var(--text); background: rgba(255,255,255,0.04); }
 
 /* ── Main ───────────────────────────────────────────────────── */
-main { padding: 0 1.5rem 2.5rem; }
+main { 
+  padding: 0 1.5rem 2.5rem;
+  overflow-y: auto;
+  max-height: calc(100vh - 90px);
+}
 .tab-content {
   display: none;
   background: var(--grad-card);
