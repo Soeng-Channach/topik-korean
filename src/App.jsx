@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Game from './components/Game'
 import ManageWords from './components/ManageWords'
 import { INITIAL_WORDS } from './data/words'
+import { TOPIK1_WORDS, TOPIK2_WORDS } from './data/topik-words'
 import './App.css'
 
 const STORAGE_KEY = 'korean-words'
@@ -38,6 +39,10 @@ export default function App() {
     setWords(prev => prev.filter(w => w.id !== id))
   }
 
+  function resetWords() {
+    setWords(INITIAL_WORDS.map((w, i) => ({ ...w, id: i + 1 })))
+  }
+
   return (
     <>
       <header>
@@ -60,10 +65,10 @@ export default function App() {
 
       <main>
         <div className={`tab-content${tab === 'game' ? ' active' : ''}`}>
-          <Game words={words} />
+          <Game words={words} topik1={TOPIK1_WORDS} topik2={TOPIK2_WORDS} />
         </div>
         <div className={`tab-content${tab === 'manage' ? ' active' : ''}`}>
-          <ManageWords words={words} onAdd={addWord} onUpdate={updateWord} onDelete={deleteWord} />
+          <ManageWords words={words} onAdd={addWord} onUpdate={updateWord} onDelete={deleteWord} onReset={resetWords} topik1={TOPIK1_WORDS} topik2={TOPIK2_WORDS} />
         </div>
       </main>
 
