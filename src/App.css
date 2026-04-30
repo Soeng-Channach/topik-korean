@@ -312,12 +312,14 @@ button {
 .empty-msg { color: var(--text3); font-size: 0.85rem; text-align: center; padding: 2.5rem 1rem; }
 
 /* ── Bottom nav (mobile) ────────────────────────────────────── */
-.bottom-nav { display: none; }
+.bottom-nav { display: none; padding-bottom: env(safe-area-inset-bottom, 0px); }
 
 /* ── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 900px) {
-  .crud-grid { grid-template-columns: 1fr; }
-  #wordList { max-height: 360px; }
+  .crud-grid { grid-template-columns: 1fr; gap: 1.25rem; }
+  .tab-content { overflow-y: auto; }
+  #wordList { max-height: none; }
+  .word-item .km { display: none; }
 }
 
 @media (max-width: 640px) {
@@ -340,18 +342,43 @@ button {
     color: #a5b4fc; border-top-color: var(--indigo);
     background: rgba(99,102,241,0.08); box-shadow: none;
   }
-  main { padding-bottom: 90px; }
+  main { padding-bottom: calc(65px + env(safe-area-inset-bottom, 0px)); }
   .tab-content { border-radius: var(--radius); border-top: 1px solid var(--border-light); }
+  /* Game layout */
+  .game-wrap { padding: 0.4rem 0.75rem 1.25rem; }
+  .english-word-card { padding: 1rem 1.25rem; margin-bottom: 0.75rem; }
   .choices { grid-template-columns: 1fr; }
   .choices .choice-btn:last-child:nth-child(odd) { grid-column: 1; }
-  .stats-bar { gap: 0.35rem; }
+  .choice-btn { min-height: 52px; }
+  /* Stats bar */
+  .stats-bar { gap: 0.35rem; margin-bottom: 0.9rem; }
   .stat-chip { padding: 0.5rem 0.6rem; min-width: 50px; }
   .stat-chip .stat-val { font-size: 1.2rem; }
   .chip-label { font-size: 0.5rem; }
+  /* Word list items */
   .word-item { grid-template-columns: 1fr auto auto; }
   .word-item .cat { display: none; }
+  .btn-edit, .btn-del { padding: 0.38rem 0.65rem; min-height: 36px; }
+  /* Source tabs */
+  .source-tab { font-size: 0.65rem; padding: 0.42rem 0.3rem; }
+  .source-count { font-size: 0.58rem; }
+  /* Header */
   header { padding: 0.75rem 1rem; }
-  main { padding-left: 0.75rem; padding-right: 0.75rem; }
+  main { padding-left: 0.5rem; padding-right: 0.5rem; }
+  .tab-content { padding: 0.75rem 0.75rem; }
+}
+
+@media (max-width: 420px) {
+  .game-mode-bar { gap: 0.3rem; }
+  .mode-btn { padding: 0.4rem 0.25rem; }
+  .mode-label { font-size: 0.72rem; }
+  .mode-sub { font-size: 0.48rem; letter-spacing: 0.04em; }
+  .stats-bar { gap: 0.2rem; }
+  .stat-chip { padding: 0.4rem 0.35rem; min-width: 44px; }
+  .stat-chip .stat-val { font-size: 1.05rem; }
+  .chip-label { font-size: 0.45rem; }
+  .source-tab { font-size: 0.6rem; padding: 0.38rem 0.2rem; gap: 0.2rem; }
+  .filter-cat-select { font-size: 0.72rem; }
 }
 
 @media (max-width: 380px) {
@@ -529,7 +556,6 @@ button {
   font-size: 0.9rem; color: #fbbf24; font-weight: 500;
   white-space: nowrap;
 }
-@media (max-width: 900px) { .word-item .km { display: none; } }
 
 /* ── Game: mode selector ────────────────────────────────────── */
 .game-mode-bar {
