@@ -1,12 +1,18 @@
 import { useState, useMemo, useRef } from 'react'
 import { CATEGORIES } from '../data/words'
 
-export default function ManageWords({ words, onAdd, onUpdate, onDelete, onReset, topik1 = [], topik2 = [] }) {
+export default function ManageWords({
+  words, onAdd, onUpdate, onDelete, onReset,
+  topik1 = [], topik2 = [],
+  onTopikAdd, onTopikUpdate, onTopikDelete, onTopikReset,
+}) {
   // form state
   const [englishInput, setEnglishInput] = useState('')
   const [koreanInput, setKoreanInput] = useState('')
+  const [khmerInput, setKhmerInput] = useState('')
   const [categoryInput, setCategoryInput] = useState('Animals')
-  const [editingId, setEditingId] = useState(null)
+  const [editingId, setEditingId] = useState(null)   // for My Words (id)
+  const [editingNo, setEditingNo] = useState(null)   // for TOPIK words (no)
   // list state
   const [source, setSource] = useState('my')          // 'my' | 'topik1' | 'topik2'
   const [search, setSearch] = useState('')
@@ -16,6 +22,7 @@ export default function ManageWords({ words, onAdd, onUpdate, onDelete, onReset,
   // ui state
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
   const [confirmReset, setConfirmReset] = useState(false)
+  const [confirmTopikReset, setConfirmTopikReset] = useState(false)
   const [toast, setToast] = useState(null)
   const fileInputRef = useRef(null)
 
@@ -28,21 +35,39 @@ export default function ManageWords({ words, onAdd, onUpdate, onDelete, onReset,
   function resetForm() {
     setEnglishInput('')
     setKoreanInput('')
+    setKhmerInput('')
     setCategoryInput('Animals')
     setEditingId(null)
+    setEditingNo(null)
   }
 
   function handleSave() {
     if (!englishInput.trim() || !koreanInput.trim()) {
-      showToast('Please fill in both words.', 'error')
+      showToast('Please fill in Korean and English words.', 'error')
       return
     }
-    if (editingId !== null) {
-      onUpdate(editingId, { englishWord: englishInput.trim(), koreanWord: koreanInput.trim(), category: categoryInput })
-      showToast('Word updated!')
+
+    if (source === 'my') {
+      if (editingId !== null) {
+        onUpdate(editingId, { englishWord: englishInput.trim(), koreanWord: koreanInput.trim(), category: categoryInput })
+        showToast('Word updated!')
+      } else {
+        onAdd({ englishWord: englishInput.trim(), koreanWord: koreanInput.trim(), category: categoryInput })
+        showToast('Word added!')
+      }
     } else {
-      onAdd({ englishWord: englishInput.trim(), koreanWord: koreanInput.trim(), category: categoryInput })
-      showToast('Word added!')
+      const wordData = {
+        englishWord: englishInput.trim(),
+        koreanWord: koreanInput.trim(),
+        khmerWord: khmerInput.trim(),
+      }
+      if (editingNo !== null) {
+        onTopikUpdate(source, editingNo, wordData)
+        showToast('Word updated!')
+      } else {
+        onTopikAdd(source, wordData)
+        showToast('Word added!')
+      }
     }
     resetForm()
   }
@@ -52,20 +77,32 @@ export default function ManageWords({ words, onAdd, onUpdate, onDelete, onReset,
   }
 
   function handleEdit(word) {
-    setEditingId(word.id)
+    if (source === 'my') {
+      setEditingId(word.id)
+      setEditingNo(null)
+    } else {
+      setEditingNo(word.no)
+      setEditingId(null)
+      setKhmerInput(word.khmerWord || '')
+    }
     setEnglishInput(word.englishWord)
     setKoreanInput(word.koreanWord)
     setCategoryInput(word.category)
     setConfirmDeleteId(null)
   }
 
-  function handleDeleteClick(id) {
-    setConfirmDeleteId(prev => prev === id ? null : id)
+  function handleDeleteClick(key) {
+    setConfirmDeleteId(prev => prev === key ? null : key)
   }
 
-  function confirmDelete(id) {
-    onDelete(id)
-    if (editingId === id) resetForm()
+  function confirmDelete(word) {
+    if (source === 'my') {
+      onDelete(word.id)
+      if (editingId === word.id) resetForm()
+    } else {
+      onTopikDelete(source, word.no)
+      if (editingNo === word.no) resetForm()
+    }
     setConfirmDeleteId(null)
     showToast('Word deleted.', 'error')
   }
@@ -79,7 +116,8 @@ export default function ManageWords({ words, onAdd, onUpdate, onDelete, onReset,
     setSource(s)
     setSearch('')
     setFilterCat('All')
-    setEditingId(null)
+    setConfirmTopikReset(false)
+    resetForm()
   }
 
   function handleExport() {
@@ -128,7 +166,7 @@ export default function ManageWords({ words, onAdd, onUpdate, onDelete, onReset,
   const filtered = useMemo(() => {
     const q = search.toLowerCase()
     let result = sourceWords.filter(w =>
-      (!q || w.englishWord.toLowerCase().includes(q) || w.koreanWord.includes(search)) &&
+      (!q || w.englishWord.toLowerCase().includes(q) || w.koreanWord.includes(search) || (w.khmerWord || '').includes(search)) &&
       (filterCat === 'All' || w.category === filterCat)
     )
     return [...result].sort((a, b) => {
@@ -145,63 +183,60 @@ export default function ManageWords({ words, onAdd, onUpdate, onDelete, onReset,
   }, [sourceWords, search, filterCat, sortField, sortDir])
 
   const isTopik = source !== 'my'
+  const isEditing = isTopik ? editingNo !== null : editingId !== null
 
   // ── render ─────────────────────────────────────────────────
   return (
     <div className="crud-grid">
 
-      {/* ── Left column: form (only for My Words) ── */}
+      {/* ── Left column: form ── */}
       <div className="form-section">
-        {isTopik ? (
-          <div className="topik-info-panel">
-            <div className={`topik-info-badge ${source}`}>
+        {/* TOPIK badge when in TOPIK mode */}
+        {isTopik && (
+          <div style={{ marginBottom: '0.75rem' }}>
+            <div className={`topik-info-badge ${source}`} style={{ display: 'inline-block' }}>
               {source === 'topik1' ? 'TOPIK I' : 'TOPIK II'}
             </div>
-            <p className="topik-info-desc">
-              {source === 'topik1'
-                ? 'Beginner vocabulary (Levels 1–2). These are read-only reference words.'
-                : 'Intermediate / Advanced vocabulary (Levels 3–6). These are read-only reference words.'}
-            </p>
-            <div className="topik-stats">
-              <div className="topik-stat">
-                <span className="topik-stat-val">{sourceWords.length}</span>
-                <span className="topik-stat-lbl">Total words</span>
-              </div>
-              <div className="topik-stat">
-                <span className="topik-stat-val">{filtered.length}</span>
-                <span className="topik-stat-lbl">Shown</span>
-              </div>
-            </div>
-            <button className="btn-secondary" style={{ width: '100%', marginTop: '1rem' }} onClick={() => handleSourceChange('my')}>
-              ← Back to My Words
-            </button>
           </div>
-        ) : (
-          <>
-            <div className="section-title">{editingId !== null ? '✏️ Edit Word' : 'Add New Word'}</div>
-            <div className="form-card">
-              <div className="form-group">
-                <label>English Word</label>
-                <input type="text" value={englishInput} onChange={e => setEnglishInput(e.target.value)} onKeyDown={handleKeyDown} placeholder="e.g. Apple" />
-              </div>
-              <div className="form-group">
-                <label>Korean Word</label>
-                <input type="text" value={koreanInput} onChange={e => setKoreanInput(e.target.value)} onKeyDown={handleKeyDown} placeholder="e.g. 사과" />
-              </div>
-              <div className="form-group">
-                <label>Category</label>
-                <select value={categoryInput} onChange={e => setCategoryInput(e.target.value)}>
-                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
-              </div>
-              <div className="btn-row">
-                <button className="btn-primary" onClick={handleSave}>
-                  {editingId !== null ? 'Update Word' : 'Save Word'}
-                </button>
-                <button className="btn-secondary" onClick={resetForm}>Clear</button>
-              </div>
-            </div>
+        )}
 
+        <div className="section-title">
+          {isEditing ? '✏️ Edit Word' : isTopik ? `Add to ${source === 'topik1' ? 'TOPIK I' : 'TOPIK II'}` : 'Add New Word'}
+        </div>
+
+        <div className="form-card">
+          <div className="form-group">
+            <label>Korean Word</label>
+            <input type="text" value={koreanInput} onChange={e => setKoreanInput(e.target.value)} onKeyDown={handleKeyDown} placeholder="e.g. 사과" />
+          </div>
+          <div className="form-group">
+            <label>English Word</label>
+            <input type="text" value={englishInput} onChange={e => setEnglishInput(e.target.value)} onKeyDown={handleKeyDown} placeholder="e.g. Apple" />
+          </div>
+          {isTopik ? (
+            <div className="form-group">
+              <label>Khmer Word</label>
+              <input type="text" value={khmerInput} onChange={e => setKhmerInput(e.target.value)} onKeyDown={handleKeyDown} placeholder="e.g. ផ្លែប៉ោម" />
+            </div>
+          ) : (
+            <div className="form-group">
+              <label>Category</label>
+              <select value={categoryInput} onChange={e => setCategoryInput(e.target.value)}>
+                {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+          )}
+          <div className="btn-row">
+            <button className="btn-primary" onClick={handleSave}>
+              {isEditing ? 'Update Word' : 'Save Word'}
+            </button>
+            <button className="btn-secondary" onClick={resetForm}>Clear</button>
+          </div>
+        </div>
+
+        {/* My Words: export/import/reset */}
+        {!isTopik && (
+          <>
             <div className="io-row">
               <button className="btn-io" onClick={handleExport} title="Download word list as JSON">↓ Export</button>
               <button className="btn-io" onClick={() => fileInputRef.current?.click()} title="Import words from JSON file">↑ Import</button>
@@ -216,6 +251,32 @@ export default function ManageWords({ words, onAdd, onUpdate, onDelete, onReset,
               </div>
             ) : (
               <button className="btn-reset-defaults" onClick={() => setConfirmReset(true)}>↺ Reset to Defaults</button>
+            )}
+          </>
+        )}
+
+        {/* TOPIK: stats + reset */}
+        {isTopik && (
+          <>
+            <div className="topik-stats" style={{ marginTop: '1rem' }}>
+              <div className="topik-stat">
+                <span className="topik-stat-val">{sourceWords.length}</span>
+                <span className="topik-stat-lbl">Total</span>
+              </div>
+              <div className="topik-stat">
+                <span className="topik-stat-val">{filtered.length}</span>
+                <span className="topik-stat-lbl">Shown</span>
+              </div>
+            </div>
+
+            {confirmTopikReset ? (
+              <div className="reset-confirm-bar" style={{ marginTop: '1rem' }}>
+                <span className="delete-confirm-label">Reset to original {source === 'topik1' ? 'TOPIK I' : 'TOPIK II'} words?</span>
+                <button className="btn-confirm-yes" onClick={() => { onTopikReset(source); setConfirmTopikReset(false); resetForm(); showToast('Reset to defaults.') }}>Reset</button>
+                <button className="btn-confirm-no" onClick={() => setConfirmTopikReset(false)}>Cancel</button>
+              </div>
+            ) : (
+              <button className="btn-reset-defaults" style={{ marginTop: '1rem', width: '100%' }} onClick={() => setConfirmTopikReset(true)}>↺ Reset to Defaults</button>
             )}
           </>
         )}
@@ -250,7 +311,7 @@ export default function ManageWords({ words, onAdd, onUpdate, onDelete, onReset,
           <input
             type="text"
             style={{ paddingLeft: '2.2rem' }}
-            placeholder="Search English or Korean…"
+            placeholder="Search Korean, English or Khmer…"
             value={search}
             onChange={e => setSearch(e.target.value)}
             autoComplete="off"
@@ -278,33 +339,33 @@ export default function ManageWords({ words, onAdd, onUpdate, onDelete, onReset,
         <div id="wordList">
           {filtered.length === 0
             ? <div className="empty-msg">No words found.</div>
-            : filtered.map((w, idx) => (
-              <div
-                key={isTopik ? idx : w.id}
-                className={`word-item${!isTopik && editingId === w.id ? ' selected' : ''}${isTopik ? ` topik-item ${source}` : ''}`}
-              >
-                <span className="en">{w.englishWord}</span>
-                <span className="kr">{w.koreanWord}</span>
-                {w.khmerWord && <span className="km">{w.khmerWord}</span>}
-                <span className="cat">{w.category}</span>
-                {isTopik ? (
-                  <span className={`topik-readonly-badge ${source}`}>
-                    {source === 'topik1' ? 'T1' : 'T2'}
-                  </span>
-                ) : confirmDeleteId === w.id ? (
-                  <div className="delete-confirm">
-                    <span className="delete-confirm-label">Delete?</span>
-                    <button className="btn-confirm-yes" onClick={() => confirmDelete(w.id)}>Yes</button>
-                    <button className="btn-confirm-no" onClick={() => setConfirmDeleteId(null)}>No</button>
-                  </div>
-                ) : (
-                  <div className="actions">
-                    <button className="btn-edit" onClick={() => handleEdit(w)}>Edit</button>
-                    <button className="btn-del" onClick={() => handleDeleteClick(w.id)} aria-label="Delete word">✕</button>
-                  </div>
-                )}
-              </div>
-            ))
+            : filtered.map((w, idx) => {
+              const itemKey = isTopik ? w.no ?? idx : w.id
+              const isEditingThis = isTopik ? editingNo === w.no : editingId === w.id
+              return (
+                <div
+                  key={itemKey}
+                  className={`word-item${isEditingThis ? ' selected' : ''}${isTopik ? ` topik-item ${source}` : ''}`}
+                >
+                  <span className="en">{w.englishWord}</span>
+                  <span className="kr">{w.koreanWord}</span>
+                  {w.khmerWord && <span className="km">{w.khmerWord}</span>}
+                  <span className="cat">{w.category}</span>
+                  {confirmDeleteId === itemKey ? (
+                    <div className="delete-confirm">
+                      <span className="delete-confirm-label">Delete?</span>
+                      <button className="btn-confirm-yes" onClick={() => confirmDelete(w)}>Yes</button>
+                      <button className="btn-confirm-no" onClick={() => setConfirmDeleteId(null)}>No</button>
+                    </div>
+                  ) : (
+                    <div className="actions">
+                      <button className="btn-edit" onClick={() => handleEdit(w)}>Edit</button>
+                      <button className="btn-del" onClick={() => handleDeleteClick(itemKey)} aria-label="Delete word">✕</button>
+                    </div>
+                  )}
+                </div>
+              )
+            })
           }
         </div>
       </div>

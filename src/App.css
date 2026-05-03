@@ -143,6 +143,12 @@ main {
   letter-spacing: -0.01em;
   text-shadow: 0 0 60px rgba(139,92,246,0.6), 0 2px 20px rgba(0,0,0,0.4);
 }
+.english-word-card .khmer-word {
+  font-size: clamp(1rem, 3vw, 1.4rem);
+  color: rgba(196,181,253,0.85);
+  margin-top: 0.3rem;
+  position: relative;
+}
 .word-category-badge {
   display: inline-block; margin-top: 0.75rem;
   padding: 0.25rem 0.8rem;

@@ -208,6 +208,9 @@ export default function Game({ words, topik1, topik2 }) {
           <div className="english-word-card" key={question.englishWord}>
             <div className="card-label">Translate to Korean</div>
             <div className="word">{question.englishWord}</div>
+            {question.khmerWord && (
+              <div className="khmer-word">{question.khmerWord}</div>
+            )}
             <div className="word-category-badge">{question.category}</div>
           </div>
 
